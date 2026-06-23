@@ -3,8 +3,8 @@ import { body,validationResult } from "express-validator";
 function validaterequest(req,res,next){
 
     const errors = validationResult(req)
-    if(!error.isEmpty()){
-        return res.status(400).json({error:errors.arrays()})  
+    if(!errors.isEmpty()){
+        return res.status(400).json({error:errors.array()})  
     
     }
     next();
@@ -33,3 +33,11 @@ export const validateRegisterUser = [
     validaterequest
 
 ];
+
+export const validateloginuser = [
+    body("email")
+        .isEmail().withMessage("Invalid email format"),
+    body("password")
+        .isEmail().withMessage("Invalid Password format"),
+    validaterequest
+]

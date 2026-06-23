@@ -1,13 +1,14 @@
-import { useState } from 'react'
+import { Provider } from 'react-redux'
+import { store } from './app.store.js'
 import './App.css'
+import { RouterProvider } from 'react-router'
+import { routes } from './app.routes.jsx'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-   <>
-   <h1>Hello</h1>
-   </>
+   <Provider store={store}>
+     <RouterProvider router={routes} />
+   </Provider>
   )
 }
 
