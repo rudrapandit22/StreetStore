@@ -2,6 +2,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import authRouter from "./routes/auth.routes.js";
+import product
 import cors from "cors";
 import "./config/passport.js"; // registers the Google strategy
 
