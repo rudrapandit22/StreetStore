@@ -1,18 +1,15 @@
-import express, { Router } from "express";
+import express from "express";
 import { authenticateSeller } from "../middlewares/auth.middle.js";
-import { createproduct } from "../controllers/product.controller.js";
-import multer from "multer";
-
-const upload = multer({
-    storage:multer.memoryStorage(),
-    limits:{
-        fileSize:5*1024*1024
-    }
-})
+import { createproduct, getsellerproduct, imagekitAuth } from "../controllers/product.controller.js";
 
 const router = express.Router();
 
+// Returns ImageKit signed auth params so the frontend can upload directly
+router.get("/imagekit-auth", authenticateSeller, imagekitAuth);
 
-router.post("/",authenticateSeller,upload.array('images',7),createproduct)
+// Create product — receives JSON body with imageUrls[] already uploaded to ImageKit
+router.post("/", authenticateSeller, createproduct);
+
+router.get("/seller", authenticateSeller, getsellerproduct);
 
 export default router;

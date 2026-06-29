@@ -1,15 +1,19 @@
 import ImageKit from '@imagekit/nodejs';
 import { config } from '../config/config.js';
 
-const client = new ImageKit({
-    privateKey: process.env['IMAGEKIT_PRIVATE_KEY'], // This is the default and can be omitted
-  });
+export const imagekitclient = new ImageKit({
+    privateKey: config.IMAGEKIT_PRIVATE_KEY,
+});
 
-export async function uploadfile({buffer,fileName,folder ="snitch"}){
-    const result = await client.files.upload({
-        file:await ImageKit.toFile(buffer),
+export async function uploadfile({ buffer, fileName, folder = "snitch" }) {
+    const result = await imagekitclient.files.upload({
+        file: await ImageKit.toFile(buffer),
         fileName,
         folder
     })
-    return result 
+    return result
+}
+
+export function getAuthParams() {
+    return imagekitclient.getAuthenticationParameters();
 }
