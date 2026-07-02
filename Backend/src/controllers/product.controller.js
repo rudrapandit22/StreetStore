@@ -1,5 +1,5 @@
 import productmodel from "../models/product.model.js";
-import { getAuthParams } from "../services/storage.service.js";
+import { getAuthParams, uploadfile } from "../services/storage.service.js";
 import { config } from "../config/config.js";
 
 // Returns a signed auth token + public key for the frontend ImageKit SDK
@@ -112,5 +112,96 @@ export async function getproductbyid(req, res) {
             success: false,
             message: error.message
         });
+    }
+}
+
+export async function addVariant(req, res) {
+    try {
+        const { productId } = req.params;
+        const { stock, price, currency, attributes } = req.body;
+
+        const product = await productmodel.findById(productId);
+        if (!product) {
+            return res.status(404).json({ success: false, message: "Product not found" });
+        }
+
+        let parsedAttributes = {};
+        if (attributes) {
+            try {
+                parsedAttributes = typeof attributes === 'string' ? JSON.parse(attributes) : attributes;
+            } catch (err) {
+                parsedAttributes = {};
+            }
+        }
+
+        let variantPrice = undefined;
+        if (price) {
+            variantPrice = {
+                amount: Number(price),
+                currency: currency || product.price.currency || "INR"
+            };
+        } else {
+            variantPrice = {
+                amount: product.price.amount,
+                currency: product.price.currency || "INR"
+            };
+        }
+
+        const imageUrls = [];
+        if (req.files && req.files.length > 0) {
+            for (const file of req.files) {
+                const uploadResult = await uploadfile({
+                    buffer: file.buffer,
+                    fileName: `snitch_var_${Date.now()}_${file.originalname || 'image.jpg'}`,
+                    folder: '/snitch/variants'
+                });
+                imageUrls.push(uploadResult.url);
+            }
+        }
+
+        const images = imageUrls.map(url => ({ url }));
+
+        const newVariant = {
+            stock: stock !== undefined ? Number(stock) : 0,
+            price: variantPrice,
+            attributes: parsedAttributes,
+            images
+        };
+
+        product.variants.push(newVariant);
+        await product.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Variant added successfully",
+            product
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+export async function updateVariantStock(req, res) {
+    try {
+        const { productId } = req.params;
+        const { variantId, stock } = req.body;
+
+        const product = await productmodel.findOneAndUpdate(
+            { _id: productId, "variants._id": variantId },
+            { $set: { "variants.$.stock": Number(stock) } },
+            { new: true }
+        );
+
+        if (!product) {
+            return res.status(404).json({ success: false, message: "Product or Variant not found" });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Stock updated successfully",
+            product
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
     }
 }

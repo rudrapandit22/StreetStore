@@ -1,5 +1,5 @@
 import mongoose from "mongoose"
-
+import priceSchema from "./price.schema.js";
 const productSchema = new mongoose.Schema({
     title:{
         type:String,
@@ -15,22 +15,38 @@ const productSchema = new mongoose.Schema({
         required:true
     },
     price:{
-        amount:{
-            type:Number,
-            required:true
-        },
-        currency:{
-            type:String,
-            enum:["USD","INR","JPY","EUR"],
-            default:"INR"
-        }
-    },
+                type:priceSchema,
+                required:true
+            },
     images:[{
-        url:{
+        url:{ 
             type:String,
             required:true
         },
     }],
+    variants:[
+        {
+            images:[
+                {
+                    url:{
+                        type:String,
+                        required:true
+                    }
+                }
+            ],
+            stock:{
+                type:Number,
+                default:0
+            },
+            attributes:{
+                type:Map,
+                of:String
+            },
+            price:{
+                type:priceSchema,
+            }
+        }
+    ]
 
 },{timestamps:true}
 )

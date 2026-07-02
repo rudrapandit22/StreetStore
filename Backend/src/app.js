@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import authRouter from "./routes/auth.routes.js";
 import productRouter from "./routes/product.routes.js";
+import cartrouter from "./routes/cart.routes.js";
 import cors from "cors";
 import "./config/passport.js"; // registers the Google strategy
 
@@ -40,5 +41,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRouter);
 app.use("/api/products", productRouter);
+app.use("/api/cart",cartrouter);
+
 
 export default app;
