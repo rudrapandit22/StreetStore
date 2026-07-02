@@ -12,10 +12,15 @@ const productslice = createSlice({
         },
         setproducts: (state, action) => {
             state.products = action.payload;
+        },
+        updateproductinstate: (state, action) => {
+            const updatedProduct = action.payload;
+            state.sellerproducts = state.sellerproducts.map(p => p._id === updatedProduct._id ? updatedProduct : p);
+            state.products = state.products.map(p => p._id === updatedProduct._id ? updatedProduct : p);
         }
     }
 })
 
-export const { setsellerproducts, setproducts } = productslice.actions
+export const { setsellerproducts, setproducts, updateproductinstate } = productslice.actions
 
 export default productslice.reducer

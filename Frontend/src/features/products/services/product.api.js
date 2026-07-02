@@ -33,3 +33,23 @@ export async function getproductbyid(productId) {
     const response = await productapiinstance.get(`/${productId}`)
     return response.data
 }
+
+export async function addproductvariant(productId, newproductvariant) {
+    const formData = new FormData()
+
+    newproductvariant.images.forEach((image)=>{
+        formData.append("image", image.file)
+    })
+    formData.append("stock",newproductvariant.stock)
+    formData.append("price",newproductvariant.priceAmount || '')
+    formData.append("currency",newproductvariant.priceCurrency || 'INR')
+    formData.append("attributes", typeof newproductvariant.attributes === 'object' ? JSON.stringify(newproductvariant.attributes) : newproductvariant.attributes)
+    
+    const response = await productapiinstance.post(`/${productId}/variants`, formData)
+    return response.data
+}
+
+export async function updateVariantStockApi(productId, variantId, stock) {
+    const response = await productapiinstance.put(`/${productId}/variants/stock`, { variantId, stock })
+    return response.data
+}

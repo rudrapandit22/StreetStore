@@ -1,30 +1,35 @@
 import React, { useState, useRef } from 'react';
 import { useproduct } from '../hooks/useproducts';
 import { getImagekitAuth } from '../services/product.api';
-import ImageKit from '@imagekit/javascript';
+import ImageKit from 'imagekit-javascript';
 
 const CURRENCIES = ['INR', 'USD', 'EUR', 'GBP', 'AED', 'SGD', 'JPY'];
 const MAX_IMAGES = 7;
 
 // Upload a single File object directly to ImageKit from the browser
 async function uploadToImageKit(file) {
-  const auth = await getImagekitAuth();
+  try {
+    const auth = await getImagekitAuth();
 
-  const ik = new ImageKit({
-    publicKey: auth.publicKey,
-    urlEndpoint: auth.urlEndpoint,
-  });
+    const ik = new ImageKit({
+      publicKey: auth.publicKey,
+      urlEndpoint: auth.urlEndpoint,
+    });
 
-  const result = await ik.upload({
-    file,
-    fileName: `snitch_${Date.now()}_${file.name}`,
-    folder: '/snitch/products',
-    token: auth.token,
-    signature: auth.signature,
-    expire: auth.expire,
-  });
+    const result = await ik.upload({
+      file,
+      fileName: `snitch_${Date.now()}_${file.name}`,
+      folder: '/snitch/products',
+      token: auth.token,
+      signature: auth.signature,
+      expire: auth.expire,
+    });
 
-  return result.url;
+    return result.url;
+  } catch (err) {
+    console.error("Error in uploadToImageKit:", err);
+    throw err;
+  }
 }
 
 // ── Per-image upload progress indicator ─────────────────────────────────────
@@ -138,6 +143,7 @@ const CreateProduct = () => {
             prev.map((item, idx) => idx === i ? { ...item, status: 'done', url, progress: 100 } : item)
           );
         } catch (uploadErr) {
+          console.error("Image upload error detail:", uploadErr);
           setImages((prev) =>
             prev.map((item, idx) => idx === i ? { ...item, status: 'error', progress: 0 } : item)
           );
@@ -159,6 +165,7 @@ const CreateProduct = () => {
       images.forEach((img) => URL.revokeObjectURL(img.preview));
       setImages([]);
     } catch (err) {
+      console.error("Overall product creation submission error:", err);
       setError(err?.message || 'Something went wrong. Please try again.');
     } finally {
       setSubmitting(false);

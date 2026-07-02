@@ -1,6 +1,6 @@
-import {createproduct,getsellerproduct,getallproducts,getproductbyid} from "../services/product.api"
+import {createproduct,getsellerproduct,getallproducts,getproductbyid,addproductvariant,updateVariantStockApi} from "../services/product.api"
 import {useDispatch} from "react-redux"
-import { setsellerproducts,setproducts } from "../state/product.slice"
+import { setsellerproducts,setproducts,updateproductinstate } from "../state/product.slice"
 
 
 export const useproduct = ()=>{
@@ -30,5 +30,17 @@ export const useproduct = ()=>{
         return data.product
     }
 
-    return {handlecreateproduct,handlegetsellerproduct,handlegetallproducts,handlegetproductbyid};
+    async function handleaddvariant(productId, variantData){
+        const data = await addproductvariant(productId, variantData)
+        dispatch(updateproductinstate(data.product))
+        return data.product
+    }
+
+    async function handleupdatevariantstock(productId, variantId, stock){
+        const data = await updateVariantStockApi(productId, variantId, stock)
+        dispatch(updateproductinstate(data.product))
+        return data.product
+    }
+
+    return {handlecreateproduct,handlegetsellerproduct,handlegetallproducts,handlegetproductbyid,handleaddvariant,handleupdatevariantstock};
 }

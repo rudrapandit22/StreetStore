@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useproduct } from '../hooks/useproducts';
-import { Link } from 'react-router';
+import { Link, Navigate } from 'react-router';
 
 // ── Currency symbol map ─────────────────────────────────────────────────────
 const CURRENCY_SYMBOLS = { INR: '₹', USD: '$', EUR: '€', GBP: '£', AED: 'د.إ', SGD: 'S$', JPY: '¥' };
@@ -47,7 +47,7 @@ const ProductCard = ({ product }) => {
   const hasMultiple = product.images?.length > 1;
 
   return (
-    <div className="group bg-white border border-[#EBE7DF] rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-[0_8px_32px_rgb(180,170,155,0.18)] hover:-translate-y-0.5">
+    <Link to={`/seller/product/${product._id}`} className="group bg-white border border-[#EBE7DF] rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-[0_8px_32px_rgb(180,170,155,0.18)] hover:-translate-y-0.5 block">
       {/* Image area */}
       <div className="relative aspect-[4/3] bg-[#F5F2ED] overflow-hidden">
         {product.images?.length > 0 ? (
@@ -78,10 +78,13 @@ const ProductCard = ({ product }) => {
             {product.images.map((_, i) => (
               <button
                 key={i}
-                onClick={() => setImgIdx(i)}
-                className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${
-                  i === imgIdx ? 'bg-white scale-125' : 'bg-white/50'
-                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setImgIdx(i);
+                }}
+                className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${i === imgIdx ? 'bg-white scale-125' : 'bg-white/50'
+                  }`}
               />
             ))}
           </div>
@@ -114,7 +117,7 @@ const ProductCard = ({ product }) => {
           </span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
@@ -256,8 +259,8 @@ const Dashboard = () => {
             : products.length === 0
               ? <EmptyState />
               : products.map((product) => (
-                  <ProductCard key={product._id} product={product} />
-                ))}
+                <ProductCard key={product._id} product={product} />
+              ))}
         </div>
       </div>
     </div>
