@@ -366,17 +366,11 @@ const ProductDetails = () => {
                   {sortedKeys.map(key => {
                     const values = getValuesForAttribute(key);
                     const isColorKey = key.toLowerCase().includes('color') || key.toLowerCase().includes('colour');
-                    const isSizeKey = key.toLowerCase().includes('size');
 
                     return (
                       <div key={key}>
                         <div className="flex items-center justify-between mb-2.5">
                           <h3 className="text-xs uppercase tracking-wider font-extrabold text-[#1A1817]">{key}</h3>
-                          {isSizeKey && (
-                            <button className="text-[10px] font-bold text-[#FF3E6C] hover:text-[#E0355C] uppercase tracking-wider select-none">
-                              Size Chart &gt;
-                            </button>
-                          )}
                         </div>
 
                         <div className="flex flex-wrap gap-3">
@@ -394,7 +388,7 @@ const ProductDetails = () => {
                                 >
                                   <div className={`w-12 h-16 rounded-xl overflow-hidden border-2 bg-white flex-shrink-0 transition-all shadow-sm
                                     ${isSelected
-                                      ? 'border-[#FF3E6C] ring-2 ring-[#FF3E6C]/25 scale-105'
+                                      ? 'border-[#8C7A65] ring-2 ring-[#8C7A65]/25 scale-105'
                                       : isAvailable
                                         ? 'border-[#EBE7DF] hover:border-neutral-400'
                                         : 'border-[#EBE7DF]/45 opacity-40'
@@ -404,7 +398,7 @@ const ProductDetails = () => {
                                   </div>
                                   <span className={`text-[9px] font-bold uppercase tracking-wider transition-colors ${
                                     isSelected 
-                                      ? 'text-[#FF3E6C]' 
+                                      ? 'text-[#8C7A65]' 
                                       : isAvailable 
                                         ? 'text-[#6B5A47]' 
                                         : 'text-[#6B5A47]/45 line-through'
@@ -422,7 +416,7 @@ const ProductDetails = () => {
                                 onClick={() => handleSelectAttribute(key, val)}
                                 className={`w-11 h-11 rounded-full border flex items-center justify-center font-bold text-xs transition-all relative ${
                                   isSelected
-                                    ? 'border-[#FF3E6C] bg-white text-[#FF3E6C] ring-1 ring-[#FF3E6C]'
+                                    ? 'border-[#8C7A65] bg-white text-[#8C7A65] ring-1 ring-[#8C7A65]'
                                     : isAvailable
                                       ? 'border-[#EBE7DF] bg-white text-neutral-800 hover:border-neutral-400'
                                       : 'border-[#EBE7DF]/45 bg-white/40 text-neutral-400 line-through cursor-not-allowed'
@@ -445,17 +439,6 @@ const ProductDetails = () => {
               );
             })()}
 
-            {/* Recommendation banner */}
-            <div className="bg-[#FAF9F5] border border-[#EBE7DF] rounded-2xl p-4 flex items-center gap-3.5">
-              <svg className="w-5 h-5 text-[#8C7A65] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.753 2.481.162l5.772-4.852a2.25 2.25 0 00.222-3.136L12.062 4.22a2.25 2.25 0 00-1.591-.659h-.903z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 7.5h.008v.008H6V7.5z" />
-              </svg>
-              <span className="text-[10px] text-[#6B5A47] font-bold uppercase tracking-wider leading-relaxed">
-                We recommend size based on your purchase history.
-              </span>
-            </div>
-
             <div className="border-t border-[#EBE7DF] pt-5">
               <h3 className="text-xs uppercase tracking-wider font-extrabold text-[#1A1817] mb-2.5">Product Description</h3>
               <p className="text-[#6B5A47] text-xs leading-relaxed whitespace-pre-line">
@@ -463,13 +446,13 @@ const ProductDetails = () => {
               </p>
             </div>
 
-            {/* Actions CTA: Myntra Pink ADD TO BAG */}
+            {/* Actions CTA: StreetStore Charcoal ADD TO BAG */}
             <div className="border-t border-[#EBE7DF] pt-6 pb-12">
               <div className="flex gap-4">
                 <button
                   onClick={() => handleAction('cart')}
                   disabled={addingToCart || buyingNow || !selectedVariant || selectedVariant.stock === 0}
-                  className="flex-1 bg-[#FF3E6C] hover:bg-[#E0355C] disabled:bg-neutral-300 text-white text-xs font-bold uppercase tracking-widest py-4 px-6 rounded-xl transition-all shadow-md active:scale-[0.98] disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="flex-1 bg-[#1C1917] hover:bg-[#2C2927] disabled:bg-neutral-300 text-white text-xs font-bold uppercase tracking-widest py-4 px-6 rounded-xl transition-all shadow-md active:scale-[0.98] disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
