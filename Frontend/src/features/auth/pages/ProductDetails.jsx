@@ -86,7 +86,7 @@ const ProductDetails = () => {
       {/* Premium Navbar */}
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#EBE7DF] px-6 py-4 flex items-center justify-between">
         <Link to="/" className="text-xl font-extrabold tracking-widest uppercase font-serif text-[#1C1917]">
-          SNITCH
+          STREETSTORE
         </Link>
         <div className="flex items-center gap-6">
           <Link to="/" className="text-xs uppercase tracking-wider font-bold text-[#6B5A47] hover:text-[#1C1917] transition-colors">

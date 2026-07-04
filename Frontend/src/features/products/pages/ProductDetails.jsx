@@ -149,7 +149,7 @@ const ProductDetails = () => {
       {/* Premium Navbar */}
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#EBE7DF] px-6 py-4 flex items-center justify-between">
         <Link to="/" className="text-xl font-extrabold tracking-widest uppercase font-serif text-[#1C1917]">
-          SNITCH
+          STREETSTORE
         </Link>
         <div className="flex items-center gap-6">
           <Link to="/" className="text-xs uppercase tracking-wider font-bold text-[#6B5A47] hover:text-[#1C1917] transition-colors">
@@ -175,267 +175,322 @@ const ProductDetails = () => {
       </nav>
 
       {/* Main product view */}
-      <div className="max-w-4xl mx-auto px-6 py-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-          {/* Images Section */}
-          <div className="space-y-3 max-w-[360px] mx-auto w-full">
-            <div className="aspect-[3/4] bg-white border border-[#EBE7DF] rounded-2xl overflow-hidden shadow-sm relative group">
-              <img
-                src={selectedImage || 'https://placehold.co/600x800?text=No+Image'}
-                alt={product.title}
-                className="w-full h-full object-cover"
-              />
-              {displayImages.length > 1 && (
-                <>
-                  <button
-                    onClick={handlePrevImage}
-                    className="absolute left-2.5 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#1C1917] p-1.5 rounded-full shadow-md transition-all hover:scale-105 active:scale-95"
-                    aria-label="Previous image"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={handleNextImage}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#1C1917] p-1.5 rounded-full shadow-md transition-all hover:scale-105 active:scale-95"
-                    aria-label="Next image"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                </>
-              )}
-            </div>
-            {displayImages.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto pb-1">
-                {displayImages.map((img, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setSelectedImage(img.url)}
-                    className={`w-14 aspect-[3/4] rounded-lg overflow-hidden border-2 bg-white flex-shrink-0 transition-all
-                      ${selectedImage === img.url ? 'border-[#8C7A65]' : 'border-[#EBE7DF] hover:border-[#C5BEB2]'}`}
-                  >
-                    <img src={img.url} alt="" className="w-full h-full object-cover" />
-                  </button>
-                ))}
+      <div className="max-w-6xl mx-auto px-6 py-10">
+        {/* Breadcrumb */}
+        <div className="text-[10px] text-[#8C7A65] font-semibold uppercase tracking-wider mb-6 flex gap-1.5 items-center">
+          <Link to="/" className="hover:text-[#1C1917] transition-colors">Home</Link>
+          <span>/</span>
+          <span>Clothing</span>
+          <span>/</span>
+          <span>{product.title}</span>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-start">
+          {/* Left Column: Images grid (Myntra style 2 columns of images) */}
+          <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {displayImages.map((img, idx) => (
+              <div key={idx} className="aspect-[3/4] bg-white border border-[#EBE7DF] rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                <img
+                  src={img.url}
+                  alt={`Product view ${idx + 1}`}
+                  className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-500"
+                />
+              </div>
+            ))}
+            {displayImages.length === 0 && (
+              <div className="aspect-[3/4] bg-white border border-[#EBE7DF] rounded-xl flex items-center justify-center text-neutral-400">
+                No images available
               </div>
             )}
           </div>
 
-          {/* Details Section */}
-          <div className="flex flex-col justify-between py-1 h-full min-h-[360px]">
+          {/* Right Column: Sticky details panel */}
+          <div className="lg:col-span-2 sticky top-24 space-y-6">
             <div>
-              <h1 className="text-xl md:text-2xl font-bold font-serif tracking-wide text-[#1C1917]">
-                {product.title}
+              <h1 className="text-2xl font-extrabold text-[#1A1817] font-serif tracking-wide uppercase">
+                STREETSTORE
               </h1>
-              <div className="mt-2 text-base font-extrabold tracking-wider text-[#8C7A65]">
-                {CURRENCY_SYMBOLS[selectedVariant?.price?.currency || product.price?.currency] || selectedVariant?.price?.currency || product.price?.currency || '₹'} {(selectedVariant?.price?.amount ?? product.price?.amount)?.toLocaleString()}
-              </div>
+              <h2 className="text-[#6B5A47] text-sm font-medium mt-1">
+                {product.title}
+              </h2>
 
-              {user && product && (
-                ((typeof product.seller === 'string' && product.seller === user._id) ||
-                 (product.seller?._id && product.seller._id === user._id) ||
-                 (product.seller === user._id))
-              ) && (
-                <div className="mt-4 bg-[#FAF9F5] border border-[#EBE7DF] rounded-2xl p-4 flex items-center justify-between shadow-sm">
-                  <div className="text-xs text-[#6B5A47] font-semibold">
-                    You listed this product.
-                  </div>
-                  <Link 
-                    to={`/seller/product/${product._id}`}
-                    className="bg-[#1C1917] hover:bg-[#2C2927] text-white text-[11px] font-bold px-3 py-1.5 rounded-xl transition-all"
-                  >
-                    Manage Variants & Stock
-                  </Link>
+              {/* Ratings */}
+              <div className="flex items-center gap-2 mt-3.5">
+                <div className="flex items-center gap-1 bg-[#FAF9F5] border border-[#EBE7DF] px-2 py-0.5 rounded-md text-[10px] font-extrabold text-neutral-800">
+                  <span>4.3</span>
+                  <span className="text-amber-500">★</span>
                 </div>
-              )}
+                <span className="text-[10px] text-[#B5ADA2] font-semibold uppercase tracking-wider">
+                  | 11.1k Ratings
+                </span>
+              </div>
+            </div>
 
-              {/* Variants Selector */}
-              {product.variants?.length > 0 && (() => {
-                const attributeKeys = Array.from(
-                  new Set(
-                    product.variants.flatMap(v => Object.keys(getParsedAttributes(v)))
-                  )
-                );
+            <div className="border-t border-[#EBE7DF] pt-5">
+              {/* Pricing */}
+              {(() => {
+                const basePrice = selectedVariant?.price?.amount ?? product.price?.amount ?? 0;
+                const mrpPrice = selectedVariant?.price?.mrp ?? product.price?.mrp;
+                const currencySymbol = CURRENCY_SYMBOLS[selectedVariant?.price?.currency || product.price?.currency] || "₹";
 
-                const getValuesForAttribute = (key) => {
-                  return Array.from(
-                    new Set(
-                      product.variants.map(v => getParsedAttributes(v)[key]).filter(Boolean)
-                    )
-                  );
-                };
-
-                const isOptionSelectable = (key, val) => {
-                  const testAttrs = { ...selectedAttributes, [key]: val };
-                  return product.variants.some(v => {
-                    const vAttrs = getParsedAttributes(v);
-                    return Object.entries(testAttrs).every(([k, vVal]) => vAttrs[k] === vVal);
-                  });
-                };
-
-                const handleSelectAttribute = (key, value) => {
-                  const nextAttrs = { ...selectedAttributes, [key]: value };
-                  setSelectedAttributes(nextAttrs);
-
-                  let match = product.variants.find(v => {
-                    const vAttrs = getParsedAttributes(v);
-                    return Object.entries(nextAttrs).every(([k, val]) => vAttrs[k] === val);
-                  });
-
-                  if (!match) {
-                    // Fallback: find first variant matching the clicked attribute value
-                    match = product.variants.find(v => getParsedAttributes(v)[key] === value);
-                    if (match) {
-                      const parsed = getParsedAttributes(match);
-                      const newAttrs = {};
-                      Object.entries(parsed).forEach(([k, v]) => {
-                        newAttrs[k] = v;
-                      });
-                      setSelectedAttributes(newAttrs);
-                    }
-                  }
-
-                  if (match) {
-                    setSelectedVariant(match);
-                    if (match.images && match.images.length > 0) {
-                      setSelectedImage(match.images[0].url);
-                    }
-                  } else {
-                    setSelectedVariant(null);
-                  }
-                };
-
-                const getVariantImageForValue = (key, val) => {
-                  const testAttrs = { ...selectedAttributes, [key]: val };
-                  let match = product.variants.find(v => {
-                    const vAttrs = getParsedAttributes(v);
-                    return Object.entries(testAttrs).every(([k, vVal]) => vAttrs[k] === vVal);
-                  });
-
-                  if (!match || !match.images?.length) {
-                    match = product.variants.find(v => getParsedAttributes(v)[key] === val && v.images?.length > 0);
-                  }
-
-                  if (match && match.images?.length > 0) {
-                    return match.images[0].url;
-                  }
-
-                  return product.images?.[0]?.url || 'https://placehold.co/100x130?text=No+Image';
-                };
-
-                const sortedKeys = [...attributeKeys].sort((a, b) => {
-                  const aSize = a.toLowerCase().includes('size');
-                  const bSize = b.toLowerCase().includes('size');
-                  if (aSize && !bSize) return -1;
-                  if (!aSize && bSize) return 1;
-                  return 0;
-                });
+                const discountPercent = mrpPrice && mrpPrice > basePrice
+                  ? Math.round(((mrpPrice - basePrice) / mrpPrice) * 100)
+                  : 0;
 
                 return (
-                  <div className="mt-4 border-t border-[#EBE7DF] pt-4 space-y-4">
-                    {sortedKeys.map(key => {
-                      const values = getValuesForAttribute(key);
-                      const isColorKey = key.toLowerCase().includes('color') || key.toLowerCase().includes('colour');
+                  <div className="space-y-1">
+                    <div className="flex items-baseline gap-3">
+                      <span className="text-2xl font-extrabold text-[#1A1817] tracking-wide">
+                        {currencySymbol}{basePrice.toLocaleString()}
+                      </span>
+                      {mrpPrice && mrpPrice > basePrice && (
+                        <>
+                          <span className="text-xs text-[#B5ADA2] line-through font-medium">
+                            MRP {currencySymbol}{mrpPrice.toLocaleString()}
+                          </span>
+                          <span className="text-xs text-orange-600 font-extrabold uppercase tracking-wide">
+                            ({discountPercent}% OFF)
+                          </span>
+                        </>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-emerald-600 font-extrabold uppercase tracking-wider">
+                      inclusive of all taxes
+                    </p>
+                  </div>
+                );
+              })()}
+            </div>
 
-                      return (
-                        <div key={key}>
-                          <h3 className="text-xs uppercase tracking-wider font-bold text-[#1C1917] mb-2">{key}</h3>
-                          <div className="flex flex-wrap gap-3">
-                            {values.map(val => {
-                              const isSelected = selectedAttributes[key] === val;
-                              const isAvailable = isOptionSelectable(key, val);
+            {user && product && (
+              ((typeof product.seller === 'string' && product.seller === user._id) ||
+               (product.seller?._id && product.seller._id === user._id) ||
+               (product.seller === user._id))
+            ) && (
+              <div className="bg-[#FAF9F5] border border-[#EBE7DF] rounded-2xl p-4 flex items-center justify-between shadow-sm">
+                <div className="text-xs text-[#6B5A47] font-semibold">
+                  You listed this product.
+                </div>
+                <Link 
+                  to={`/seller/product/${product._id}`}
+                  className="bg-[#1A1817] hover:bg-neutral-800 text-white text-[10px] font-bold uppercase tracking-wider px-3.5 py-2 rounded-xl transition-all"
+                >
+                  Manage Variants &amp; Stock
+                </Link>
+              </div>
+            )}
 
-                              if (isColorKey) {
-                                const imageUrl = getVariantImageForValue(key, val);
-                                return (
-                                  <button
-                                    key={val}
-                                    onClick={() => handleSelectAttribute(key, val)}
-                                    className="group flex flex-col items-center gap-1 focus:outline-none"
-                                  >
-                                    <div className={`w-12 h-16 rounded-xl overflow-hidden border-2 bg-white flex-shrink-0 transition-all shadow-sm
-                                      ${isSelected
-                                        ? 'border-[#8C7A65] ring-2 ring-[#8C7A65]/30 scale-105'
-                                        : isAvailable
-                                          ? 'border-[#EBE7DF] hover:border-[#C5BEB2]'
-                                          : 'border-[#EBE7DF]/45 opacity-40'
-                                      }`}
-                                    >
-                                      <img src={imageUrl} alt={val} className="w-full h-full object-cover" />
-                                    </div>
-                                    <span className={`text-[10px] font-medium transition-colors ${
-                                      isSelected 
-                                        ? 'text-[#8C7A65] font-bold' 
-                                        : isAvailable 
-                                          ? 'text-[#6B5A47]' 
-                                          : 'text-[#6B5A47]/45 line-through'
-                                    }`}>
-                                      {val}
-                                    </span>
-                                  </button>
-                                );
-                              }
+            {/* Variants Selector */}
+            {product.variants?.length > 0 && (() => {
+              const attributeKeys = Array.from(
+                new Set(
+                  product.variants.flatMap(v => Object.keys(getParsedAttributes(v)))
+                )
+              );
 
+              const getValuesForAttribute = (key) => {
+                return Array.from(
+                  new Set(
+                    product.variants.map(v => getParsedAttributes(v)[key]).filter(Boolean)
+                  )
+                );
+              };
+
+              const isOptionSelectable = (key, val) => {
+                const testAttrs = { ...selectedAttributes, [key]: val };
+                return product.variants.some(v => {
+                  const vAttrs = getParsedAttributes(v);
+                  return Object.entries(testAttrs).every(([k, vVal]) => vAttrs[k] === vVal);
+                });
+              };
+
+              const handleSelectAttribute = (key, value) => {
+                const nextAttrs = { ...selectedAttributes, [key]: value };
+                setSelectedAttributes(nextAttrs);
+
+                let match = product.variants.find(v => {
+                  const vAttrs = getParsedAttributes(v);
+                  return Object.entries(nextAttrs).every(([k, val]) => vAttrs[k] === val);
+                });
+
+                if (!match) {
+                  match = product.variants.find(v => getParsedAttributes(v)[key] === value);
+                  if (match) {
+                    const parsed = getParsedAttributes(match);
+                    const newAttrs = {};
+                    Object.entries(parsed).forEach(([k, v]) => {
+                      newAttrs[k] = v;
+                    });
+                    setSelectedAttributes(newAttrs);
+                  }
+                }
+
+                if (match) {
+                  setSelectedVariant(match);
+                  if (match.images && match.images.length > 0) {
+                    setSelectedImage(match.images[0].url);
+                  }
+                } else {
+                  setSelectedVariant(null);
+                }
+              };
+
+              const getVariantImageForValue = (key, val) => {
+                const testAttrs = { ...selectedAttributes, [key]: val };
+                let match = product.variants.find(v => {
+                  const vAttrs = getParsedAttributes(v);
+                  return Object.entries(testAttrs).every(([k, vVal]) => vAttrs[k] === vVal);
+                });
+
+                if (!match || !match.images?.length) {
+                  match = product.variants.find(v => getParsedAttributes(v)[key] === val && v.images?.length > 0);
+                }
+
+                if (match && match.images?.length > 0) {
+                  return match.images[0].url;
+                }
+
+                return product.images?.[0]?.url || 'https://placehold.co/100x130?text=No+Image';
+              };
+
+              const sortedKeys = [...attributeKeys].sort((a, b) => {
+                const aSize = a.toLowerCase().includes('size');
+                const bSize = b.toLowerCase().includes('size');
+                if (aSize && !bSize) return -1;
+                if (!aSize && bSize) return 1;
+                return 0;
+              });
+
+              return (
+                <div className="border-t border-[#EBE7DF] pt-5 space-y-5">
+                  {sortedKeys.map(key => {
+                    const values = getValuesForAttribute(key);
+                    const isColorKey = key.toLowerCase().includes('color') || key.toLowerCase().includes('colour');
+                    const isSizeKey = key.toLowerCase().includes('size');
+
+                    return (
+                      <div key={key}>
+                        <div className="flex items-center justify-between mb-2.5">
+                          <h3 className="text-xs uppercase tracking-wider font-extrabold text-[#1A1817]">{key}</h3>
+                          {isSizeKey && (
+                            <button className="text-[10px] font-bold text-[#FF3E6C] hover:text-[#E0355C] uppercase tracking-wider select-none">
+                              Size Chart &gt;
+                            </button>
+                          )}
+                        </div>
+
+                        <div className="flex flex-wrap gap-3">
+                          {values.map(val => {
+                            const isSelected = selectedAttributes[key] === val;
+                            const isAvailable = isOptionSelectable(key, val);
+
+                            if (isColorKey) {
+                              const imageUrl = getVariantImageForValue(key, val);
                               return (
                                 <button
                                   key={val}
                                   onClick={() => handleSelectAttribute(key, val)}
-                                  className={`text-xs px-3 py-1.5 rounded-xl border transition-all font-medium ${
-                                    isSelected
-                                      ? 'border-[#8C7A65] bg-[#FAF9F5] text-[#8C7A65] ring-1 ring-[#8C7A65]'
-                                      : isAvailable
-                                        ? 'border-[#EBE7DF] bg-white text-[#6B5A47] hover:border-[#C5BEB2]'
-                                        : 'border-[#EBE7DF]/45 bg-white/40 text-[#6B5A47]/45 line-through cursor-pointer hover:border-[#C5BEB2]'
-                                  }`}
+                                  className="group flex flex-col items-center gap-1.5 focus:outline-none"
                                 >
-                                  {val}
+                                  <div className={`w-12 h-16 rounded-xl overflow-hidden border-2 bg-white flex-shrink-0 transition-all shadow-sm
+                                    ${isSelected
+                                      ? 'border-[#FF3E6C] ring-2 ring-[#FF3E6C]/25 scale-105'
+                                      : isAvailable
+                                        ? 'border-[#EBE7DF] hover:border-neutral-400'
+                                        : 'border-[#EBE7DF]/45 opacity-40'
+                                    }`}
+                                  >
+                                    <img src={imageUrl} alt={val} className="w-full h-full object-cover" />
+                                  </div>
+                                  <span className={`text-[9px] font-bold uppercase tracking-wider transition-colors ${
+                                    isSelected 
+                                      ? 'text-[#FF3E6C]' 
+                                      : isAvailable 
+                                        ? 'text-[#6B5A47]' 
+                                        : 'text-[#6B5A47]/45 line-through'
+                                  }`}>
+                                    {val}
+                                  </span>
                                 </button>
                               );
-                            })}
-                          </div>
-                        </div>
-                      );
-                    })}
-                    {!selectedVariant && (
-                      <p className="text-red-500 text-xs font-semibold mt-2">
-                        ⚠️ Selected combination is unavailable. Please choose another option.
-                      </p>
-                    )}
-                  </div>
-                );
-              })()}
+                            }
 
-              <div className="mt-4 border-t border-[#EBE7DF] pt-4">
-                <h3 className="text-xs uppercase tracking-wider font-bold text-[#1C1917]">Description</h3>
-                <p className="mt-2 text-[#6B5A47] text-xs leading-relaxed whitespace-pre-line">
-                  {product.description}
-                </p>
-              </div>
+                            // Circular size badges
+                            return (
+                              <button
+                                key={val}
+                                onClick={() => handleSelectAttribute(key, val)}
+                                className={`w-11 h-11 rounded-full border flex items-center justify-center font-bold text-xs transition-all relative ${
+                                  isSelected
+                                    ? 'border-[#FF3E6C] bg-white text-[#FF3E6C] ring-1 ring-[#FF3E6C]'
+                                    : isAvailable
+                                      ? 'border-[#EBE7DF] bg-white text-neutral-800 hover:border-neutral-400'
+                                      : 'border-[#EBE7DF]/45 bg-white/40 text-neutral-400 line-through cursor-not-allowed'
+                                }`}
+                              >
+                                {val}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {!selectedVariant && (
+                    <p className="text-red-500 text-[10px] font-bold uppercase tracking-wide mt-2">
+                      ⚠️ Selected combination is unavailable. Please choose another option.
+                    </p>
+                  )}
+                </div>
+              );
+            })()}
+
+            {/* Recommendation banner */}
+            <div className="bg-[#FAF9F5] border border-[#EBE7DF] rounded-2xl p-4 flex items-center gap-3.5">
+              <svg className="w-5 h-5 text-[#8C7A65] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.753 2.481.162l5.772-4.852a2.25 2.25 0 00.222-3.136L12.062 4.22a2.25 2.25 0 00-1.591-.659h-.903z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 7.5h.008v.008H6V7.5z" />
+              </svg>
+              <span className="text-[10px] text-[#6B5A47] font-bold uppercase tracking-wider leading-relaxed">
+                We recommend size based on your purchase history.
+              </span>
             </div>
 
-            {/* Actions CTA */}
-            <div className="mt-6 border-t border-[#EBE7DF] pt-6">
-              <div className="grid grid-cols-2 gap-3">
+            <div className="border-t border-[#EBE7DF] pt-5">
+              <h3 className="text-xs uppercase tracking-wider font-extrabold text-[#1A1817] mb-2.5">Product Description</h3>
+              <p className="text-[#6B5A47] text-xs leading-relaxed whitespace-pre-line">
+                {product.description}
+              </p>
+            </div>
+
+            {/* Actions CTA: Myntra Pink ADD TO BAG */}
+            <div className="border-t border-[#EBE7DF] pt-6 pb-12">
+              <div className="flex gap-4">
                 <button
                   onClick={() => handleAction('cart')}
                   disabled={addingToCart || buyingNow || !selectedVariant || selectedVariant.stock === 0}
-                  className="bg-white border border-[#1C1917] text-[#1C1917] hover:bg-[#FAF9F5] text-[10px] uppercase font-bold tracking-widest py-3 px-4 rounded-xl transition-all active:scale-[0.98] disabled:opacity-50"
+                  className="flex-1 bg-[#FF3E6C] hover:bg-[#E0355C] disabled:bg-neutral-300 text-white text-xs font-bold uppercase tracking-widest py-4 px-6 rounded-xl transition-all shadow-md active:scale-[0.98] disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  {addingToCart ? "Adding..." : !selectedVariant ? "Unavailable" : selectedVariant.stock === 0 ? "Out of Stock" : "Add to Cart"}
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                  </svg>
+                  <span>
+                    {addingToCart ? "Adding..." : !selectedVariant ? "Select Options" : selectedVariant.stock === 0 ? "Out of Stock" : "Add to Bag"}
+                  </span>
                 </button>
                 <button
                   onClick={() => handleAction('buy')}
                   disabled={addingToCart || buyingNow || !selectedVariant || selectedVariant.stock === 0}
-                  className="bg-[#1C1917] text-white hover:bg-[#2C2927] text-[10px] uppercase font-bold tracking-widest py-3 px-4 rounded-xl shadow-md transition-all active:scale-[0.98] disabled:opacity-50"
+                  className="flex-1 bg-white border border-[#EBE7DF] text-neutral-800 hover:bg-[#FAF9F5] text-xs font-bold uppercase tracking-widest py-4 px-6 rounded-xl transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {buyingNow ? "Processing..." : !selectedVariant ? "Unavailable" : selectedVariant.stock === 0 ? "Out of Stock" : "Buy Now"}
+                  <svg className="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                  </svg>
+                  <span>Wishlist</span>
                 </button>
               </div>
-              <p className="text-[9px] text-center text-[#B5ADA2] uppercase tracking-wider font-semibold mt-3">
-                Free shipping &amp; simple returns nationwide
+              <p className="text-[9px] text-center text-[#B5ADA2] uppercase tracking-wider font-semibold mt-4">
+                100% Original Products · Easy 14 days returns &amp; exchanges
               </p>
             </div>
           </div>

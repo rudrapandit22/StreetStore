@@ -293,7 +293,7 @@ const CreateProduct = () => {
             List a Product
           </h1>
           <p className="text-[#4C453C] text-[10px] mt-2.5 text-center uppercase tracking-widest font-semibold">
-            Snitch · Premium Apparel &amp; Streetwear
+            StreetStore · Premium Apparel &amp; Streetwear
           </p>
         </div>
 
@@ -732,7 +732,7 @@ const CreateProduct = () => {
 
         {/* Footer */}
         <p className="text-center text-[11px] text-[#B5ADA2] mt-6 tracking-wide">
-          Products are reviewed before going live · Snitch Seller Hub
+          Products are reviewed before going live · StreetStore Seller Hub
         </p>
       </div>
     </div>

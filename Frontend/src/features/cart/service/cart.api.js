@@ -24,3 +24,8 @@ export const removeCartItem = async (productId, variantId) => {
     const response = await cartapiinstance.delete(`/remove/${productId}/${variantId}`)
     return response.data
 }
+
+export const checkoutCart = async () => {
+    const response = await cartapiinstance.post("/checkout")
+    return response.data
+}

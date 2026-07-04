@@ -20,7 +20,7 @@ export function imagekitAuth(req, res) {
 // createproduct now receives imageUrls as a JSON array (uploaded directly to ImageKit from the browser)
 export async function createproduct(req, res) {
     try {
-        const { title, description, priceAmount, priceCurrency, imageUrls, variants } = req.body;
+        const { title, description, priceAmount, priceCurrency, priceMrp, imageUrls, variants } = req.body;
         const seller = req.user;
 
         // Validate priceAmount
@@ -57,7 +57,8 @@ export async function createproduct(req, res) {
             description,
             price: {
                 amount: parsedPrice,
-                currency: priceCurrency || "INR"
+                currency: priceCurrency || "INR",
+                mrp: priceMrp ? Number(priceMrp) : undefined
             },
             images,
             variants: parsedVariants,
@@ -128,7 +129,7 @@ export async function getproductbyid(req, res) {
 export async function addVariant(req, res) {
     try {
         const { productId } = req.params;
-        const { stock, price, currency, attributes } = req.body;
+        const { stock, price, currency, attributes, mrp } = req.body;
 
         const product = await productmodel.findById(productId);
         if (!product) {
@@ -148,12 +149,14 @@ export async function addVariant(req, res) {
         if (price) {
             variantPrice = {
                 amount: Number(price),
-                currency: currency || product.price.currency || "INR"
+                currency: currency || product.price.currency || "INR",
+                mrp: mrp ? Number(mrp) : undefined
             };
         } else {
             variantPrice = {
                 amount: product.price.amount,
-                currency: product.price.currency || "INR"
+                currency: product.price.currency || "INR",
+                mrp: mrp ? Number(mrp) : product.price.mrp
             };
         }
 

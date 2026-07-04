@@ -252,7 +252,7 @@ const Dashboard = () => {
                 Seller Hub
               </h1>
               <p className="text-[#9C9188] text-[10px] uppercase tracking-widest font-semibold mt-0.5">
-                Snitch · Your Listings
+                StreetStore · Your Listings
               </p>
             </div>
           </div>

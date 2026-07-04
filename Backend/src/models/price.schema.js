@@ -7,6 +7,9 @@ const priceSchema = new mongoose.Schema({
     currency:{
         type:String,
         required:true
+    },
+    mrp:{
+        type:Number
     }
 },{
     _id:false,

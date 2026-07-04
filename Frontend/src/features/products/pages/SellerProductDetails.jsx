@@ -44,6 +44,7 @@ const SellerProductDetails = () => {
   const [variantForm, setVariantForm] = useState({
     stock: 0,
     priceAmount: '',
+    priceMrp: '',
     priceCurrency: 'INR',
     size: '',
     color: ''
@@ -142,6 +143,7 @@ const SellerProductDetails = () => {
         images: variantImages,
         stock: variantForm.stock,
         priceAmount: variantForm.priceAmount,
+        priceMrp: variantForm.priceMrp,
         priceCurrency: variantForm.priceCurrency,
         attributes: attributesObj
       };
@@ -153,6 +155,7 @@ const SellerProductDetails = () => {
       setVariantForm({
         stock: 0,
         priceAmount: '',
+        priceMrp: '',
         priceCurrency: 'INR',
         size: '',
         color: ''
@@ -204,7 +207,7 @@ const SellerProductDetails = () => {
           </span>
         </div>
         <Link to="/" className="text-lg font-extrabold tracking-widest uppercase font-serif text-[#1C1917]">
-          SNITCH
+          STREETSTORE
         </Link>
       </nav>
 
@@ -315,9 +318,7 @@ const SellerProductDetails = () => {
                       className="bg-white border border-[#EBE7DF] rounded-xl px-3 py-2 text-xs w-full focus:outline-none focus:border-[#8C7A65]"
                     />
                   </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                   {/* Stock */}
                   <div>
                     <label className="block text-xs uppercase tracking-wider font-bold text-[#1C1917] mb-1">Stock</label>
@@ -344,6 +345,19 @@ const SellerProductDetails = () => {
                     />
                   </div>
 
+                  {/* MRP */}
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider font-bold text-[#1C1917] mb-1">MRP (Optional)</label>
+                    <input
+                      type="number"
+                      placeholder="e.g. 1399"
+                      value={variantForm.priceMrp}
+                      onChange={(e) => setVariantForm(prev => ({ ...prev, priceMrp: e.target.value }))}
+                      className="bg-white border border-[#EBE7DF] rounded-xl px-3 py-2 text-xs w-full focus:outline-none focus:border-[#8C7A65]"
+                      min="0"
+                    />
+                  </div>
+
                   {/* Currency */}
                   <div>
                     <label className="block text-xs uppercase tracking-wider font-bold text-[#1C1917] mb-1">Currency</label>
@@ -358,7 +372,7 @@ const SellerProductDetails = () => {
                       <option value="JPY">JPY (¥)</option>
                     </select>
                   </div>
-                </div>
+                </div>         </div>
 
                 {/* Images Upload (Upto 7 images) */}
                 <div>

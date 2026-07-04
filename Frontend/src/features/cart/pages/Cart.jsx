@@ -8,7 +8,7 @@ const CURRENCY_SYMBOLS = { INR: '₹', USD: '$', EUR: '€', GBP: '£', AED: 'د
 
 const Cart = () => {
     const cartItems = useSelector(state => state.cart.items);
-    const { handleCart, handleUpdateQuantity, handleRemoveItem } = useCart();
+    const { handleCart, handleUpdateQuantity, handleRemoveItem, handleCheckout } = useCart();
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState(null);
     const { error, isLoading, Razorpay } = useRazorpay();
@@ -32,28 +32,15 @@ const Cart = () => {
         fetchCart();
     }, []);
 
-    const handlePayment = () => {
-        const options = {
-            key: "YOUR_RAZORPAY_KEY",
-            amount: 50000, // Amount in paise
-            currency: "INR",
-            name: "Test Company",
-            description: "Test Transaction",
-            order_id: "order_9A33XWu170gUtm", // Generate order_id on server
-            handler: (response) => {
-                console.log(response);
-                alert("Payment Successful!");
-            },
-            prefill: {
-                name: "John Doe",
-                email: "john.doe@example.com",
-                contact: "9999999999",
-            },
-            theme: {
-                color: "#F37254",
-            },
-        };
-    }
+    const handlePayment = async () => {
+        showToast("Processing order...", "info");
+        try {
+            await handleCheckout();
+            showToast("Order placed successfully", "success");
+        } catch (err) {
+            showToast(err.response?.data?.message || err.message || "Failed to place order", "error");
+        }
+    };
 
 
     const handleQtyChange = async (item, delta) => {
@@ -116,7 +103,7 @@ const Cart = () => {
             {/* Premium Navbar */}
             <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#EBE7DF] px-6 py-4 flex items-center justify-between">
                 <Link to="/" className="text-xl font-extrabold tracking-widest uppercase font-serif text-[#1C1917]">
-                    SNITCH
+                    STREETSTORE
                 </Link>
                 <Link to="/" className="text-xs uppercase tracking-wider font-bold text-[#6B5A47] hover:text-[#1C1917] transition-colors">
                     Continue Shopping

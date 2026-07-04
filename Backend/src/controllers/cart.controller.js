@@ -307,3 +307,24 @@ export const decrementquantity = async (req, res) => {
     }
 };
 
+export const checkout = async (req, res) => {
+    try {
+        let cart = await cartmodel.findOne({ user: req.user._id });
+        if (cart) {
+            cart.items = [];
+            await cart.save();
+        }
+        return res.status(200).json({
+            message: "Order placed successfully",
+            success: true,
+            cart
+        });
+    } catch (error) {
+        console.error("checkout error:", error);
+        return res.status(500).json({
+            message: "Internal server error",
+            success: false,
+            error: error.message
+        });
+    }
+};

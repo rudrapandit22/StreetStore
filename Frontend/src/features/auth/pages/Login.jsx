@@ -84,7 +84,7 @@ const Login = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
             </svg>
           </div>
-          <h2 className="text-[#1A1817] text-3xl font-extrabold tracking-widest text-center uppercase font-serif">Snitch</h2>
+          <h2 className="text-[#1A1817] text-3xl font-extrabold tracking-widest text-center uppercase font-serif">StreetStore</h2>
           <p className="text-[#4C453C] text-[10px] mt-2.5 text-center uppercase tracking-widest font-semibold">Premium Apparel &amp; Streetwear</p>
         </div>
 
@@ -120,7 +120,7 @@ const Login = () => {
               name="email"
               autoComplete="username"
               required
-              placeholder="email@snitch.co"
+              placeholder="email@streetstore.com"
               value={formData.email}
               onChange={handleChange}
               className="w-full bg-[#FAF8F5] border border-[#E6E1D8] rounded-xl px-4 py-3 text-[#1C1A17] placeholder-neutral-400 focus:outline-none focus:border-[#8C7A65] focus:ring-1 focus:ring-[#8C7A65]/20 transition-all text-sm"
@@ -199,7 +199,7 @@ const Login = () => {
 
         {/* Footer */}
         <div className="text-[#5C554D] text-xs text-center mt-8 relative z-10">
-          New to Snitch?{' '}
+          New to StreetStore?{' '}
           <a href="/register" className="text-[#3C3227] hover:text-black transition-colors font-bold">
             Create Account
           </a>

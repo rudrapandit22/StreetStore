@@ -88,7 +88,7 @@ const Register = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
             </svg>
           </div>
-          <h2 className="text-[#1A1817] text-3xl font-extrabold tracking-widest text-center uppercase font-serif">Snitch</h2>
+          <h2 className="text-[#1A1817] text-3xl font-extrabold tracking-widest text-center uppercase font-serif">StreetStore</h2>
           <p className="text-[#4C453C] text-[10px] mt-2.5 text-center uppercase tracking-widest font-semibold">Premium Apparel & Streetwear</p>
         </div>
 

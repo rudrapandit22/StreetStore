@@ -47,6 +47,7 @@ export async function addproductvariant(productId, newproductvariant) {
     })
     formData.append("stock",newproductvariant.stock)
     formData.append("price",newproductvariant.priceAmount || '')
+    formData.append("mrp",newproductvariant.priceMrp || '')
     formData.append("currency",newproductvariant.priceCurrency || 'INR')
     formData.append("attributes", typeof newproductvariant.attributes === 'object' ? JSON.stringify(newproductvariant.attributes) : newproductvariant.attributes)
     

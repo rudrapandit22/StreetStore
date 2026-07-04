@@ -1,4 +1,4 @@
-import { addItem, getCart, updateCartItemQuantity, removeCartItem } from "../service/cart.api.js"
+import { addItem, getCart, updateCartItemQuantity, removeCartItem, checkoutCart } from "../service/cart.api.js"
 import { useDispatch } from "react-redux"
 import { setItems } from "../state/card.sliice.js"
 
@@ -26,5 +26,10 @@ export const useCart = () => {
         dispatch(setItems(items))
         return data
     }
-    return { handleAdditem, handleCart, handleUpdateQuantity, handleRemoveItem }
+    async function handleCheckout (){
+        const data = await checkoutCart()
+        dispatch(setItems([]))
+        return data
+    }
+    return { handleAdditem, handleCart, handleUpdateQuantity, handleRemoveItem, handleCheckout }
 }
