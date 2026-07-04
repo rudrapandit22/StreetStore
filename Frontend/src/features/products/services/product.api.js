@@ -34,6 +34,11 @@ export async function getproductbyid(productId) {
     return response.data
 }
 
+export async function deleteproductapi(productId) {
+    const response = await productapiinstance.delete(`/${productId}`)
+    return response.data
+}
+
 export async function addproductvariant(productId, newproductvariant) {
     const formData = new FormData()
 

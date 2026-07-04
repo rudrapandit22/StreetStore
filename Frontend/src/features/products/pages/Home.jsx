@@ -102,6 +102,61 @@ const Home = () => {
                       <p className="text-[#6B5A47] text-[11px] mt-1 line-clamp-2 leading-relaxed">
                         {product.description}
                       </p>
+
+                      {/* Variant summary tags */}
+                      {(() => {
+                        if (!product.variants?.length) return null;
+                        const sizes = new Set();
+                        const colors = new Set();
+                        product.variants.forEach(v => {
+                          if (!v.attributes) return;
+                          const raw = v.attributes;
+                          let parsed = {};
+                          if (typeof raw.toJSON === 'function') parsed = raw.toJSON();
+                          else if (raw instanceof Map) parsed = Object.fromEntries(raw.entries());
+                          else parsed = raw;
+
+                          Object.entries(parsed).forEach(([k, val]) => {
+                            const kLower = k.toLowerCase();
+                            if (kLower.includes('size')) sizes.add(val);
+                            if (kLower.includes('color') || kLower.includes('colour')) colors.add(val);
+                          });
+                        });
+
+                        const sizesArr = Array.from(sizes);
+                        const colorsArr = Array.from(colors);
+
+                        if (sizesArr.length === 0 && colorsArr.length === 0) return null;
+
+                        return (
+                          <div className="mt-2.5 pt-2 border-t border-[#FAF8F5] space-y-1.5">
+                            {sizesArr.length > 0 && (
+                              <div className="flex flex-wrap items-center gap-1">
+                                <span className="text-[8px] font-bold uppercase tracking-wider text-[#8C7A65]">Sizes:</span>
+                                <div className="flex flex-wrap gap-1">
+                                  {sizesArr.map(s => (
+                                    <span key={s} className="text-[8px] px-1.5 py-0.5 bg-[#FAF9F5] border border-[#EBE7DF] rounded-md text-[#6B5A47] font-semibold">
+                                      {s}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            {colorsArr.length > 0 && (
+                              <div className="flex flex-wrap items-center gap-1">
+                                <span className="text-[8px] font-bold uppercase tracking-wider text-[#8C7A65]">Colors:</span>
+                                <div className="flex flex-wrap gap-1">
+                                  {colorsArr.map(c => (
+                                    <span key={c} className="text-[8px] px-1.5 py-0.5 bg-[#FAF9F5] border border-[#EBE7DF] rounded-md text-[#6B5A47] font-semibold">
+                                      {c}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })()}
                     </div>
                     <div className="mt-3 pt-3 border-t border-[#FAF8F5] flex items-center justify-between">
                       <span className="text-[#1C1917] font-extrabold text-xs tracking-wider">

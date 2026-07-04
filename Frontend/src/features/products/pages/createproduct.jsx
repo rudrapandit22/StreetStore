@@ -54,12 +54,22 @@ const CreateProduct = () => {
 
   // { file, preview, status: 'pending'|'uploading'|'done'|'error', url, progress }
   const [images, setImages] = useState([]);
+  const [variants, setVariants] = useState([]);
+  const [variantForm, setVariantForm] = useState({
+    size: '',
+    color: '',
+    stock: 0,
+    priceAmount: '',
+    priceCurrency: 'INR'
+  });
+  const [variantImages, setVariantImages] = useState([]); // { file, preview }
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [dragOver, setDragOver] = useState(false);
 
   const fileInputRef = useRef(null);
+  const variantFileInputRef = useRef(null);
 
   // ── Field change ────────────────────────────────────────────────────────────
   const handleChange = (e) => {
@@ -90,6 +100,59 @@ const CreateProduct = () => {
     addFiles(e.target.files);
     // reset so the same file can be re-selected
     e.target.value = '';
+  };
+
+  const handleVariantImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    const remaining = 7 - variantImages.length;
+    if (remaining <= 0) return;
+    const accepted = files.slice(0, remaining).map(file => ({
+      file,
+      preview: URL.createObjectURL(file)
+    }));
+    setVariantImages(prev => [...prev, ...accepted]);
+  };
+
+  const handleRemoveVariantImage = (index) => {
+    URL.revokeObjectURL(variantImages[index].preview);
+    setVariantImages(prev => prev.filter((_, idx) => idx !== index));
+  };
+
+  const handleAddVariantToList = () => {
+    if (!variantForm.size.trim()) {
+      alert("Size is required to add a variant.");
+      return;
+    }
+    setVariants(prev => [
+      ...prev,
+      {
+        id: `local_${Date.now()}`,
+        size: variantForm.size.trim(),
+        color: variantForm.color.trim(),
+        stock: variantForm.stock,
+        priceAmount: variantForm.priceAmount,
+        priceCurrency: variantForm.priceCurrency,
+        images: variantImages
+      }
+    ]);
+    setVariantForm({
+      size: '',
+      color: '',
+      stock: 0,
+      priceAmount: '',
+      priceCurrency: 'INR'
+    });
+    setVariantImages([]);
+  };
+
+  const handleRemoveVariantFromList = (id) => {
+    setVariants(prev => {
+      const target = prev.find(v => v.id === id);
+      if (target) {
+        target.images.forEach(img => URL.revokeObjectURL(img.preview));
+      }
+      return prev.filter(v => v.id !== id);
+    });
   };
 
   const handleDrop = (e) => {
@@ -151,6 +214,37 @@ const CreateProduct = () => {
         }
       }
 
+      // Upload variant images and build final variants array
+      const finalVariants = [];
+      for (const variant of variants) {
+        const uploadedVarUrls = [];
+        for (const img of variant.images) {
+          try {
+            const url = await uploadToImageKit(img.file);
+            uploadedVarUrls.push({ url });
+          } catch (uploadErr) {
+            console.error("Variant image upload failed:", uploadErr);
+          }
+        }
+
+        const attributesObj = {
+          Size: variant.size
+        };
+        if (variant.color) {
+          attributesObj["Color"] = variant.color;
+        }
+
+        finalVariants.push({
+          stock: Number(variant.stock) || 0,
+          price: variant.priceAmount ? {
+            amount: Number(variant.priceAmount),
+            currency: variant.priceCurrency || 'INR'
+          } : undefined,
+          attributes: attributesObj,
+          images: uploadedVarUrls
+        });
+      }
+
       // All images uploaded — create the product
       await handlecreateproduct({
         title: formData.title.trim(),
@@ -158,10 +252,13 @@ const CreateProduct = () => {
         priceAmount: formData.priceAmount,
         priceCurrency: formData.priceCurrency,
         imageUrls: JSON.stringify(uploadedUrls),
+        variants: JSON.stringify(finalVariants)
       });
 
       setSuccess('Product listed successfully! 🎉');
       setFormData({ title: '', description: '', priceAmount: '', priceCurrency: 'INR' });
+      variants.forEach(v => v.images.forEach(img => URL.revokeObjectURL(img.preview)));
+      setVariants([]);
       images.forEach((img) => URL.revokeObjectURL(img.preview));
       setImages([]);
     } catch (err) {
@@ -472,6 +569,139 @@ const CreateProduct = () => {
                   Images are uploaded securely via ImageKit
                 </p>
               )}
+            </div>
+
+            {/* ── Variants Section ──────────────────────────── */}
+            <div className="space-y-4 pt-4 border-t border-[#E6E1D8]">
+              <div className="flex items-center justify-between">
+                <label className="block text-[#1C1A17] text-[10px] font-bold uppercase tracking-wider">
+                  Product Variants ({variants.length})
+                </label>
+              </div>
+
+              {/* List of locally added variants */}
+              {variants.length > 0 && (
+                <div className="flex flex-wrap gap-2.5">
+                  {variants.map((v) => (
+                    <div key={v.id} className="flex items-center gap-2 bg-[#F5F1E9] border border-[#E2D8C6] rounded-xl px-3 py-1.5 shadow-sm text-xs">
+                      {v.images.length > 0 && (
+                        <img src={v.images[0].preview} alt="" className="w-6 h-6 rounded-md object-cover" />
+                      )}
+                      <span className="text-[#6B5A47] font-semibold">
+                        Size: {v.size} {v.color ? `| Color: ${v.color}` : ''} | Stock: {v.stock}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveVariantFromList(v.id)}
+                        className="text-[#9C9188] hover:text-[#910F0F] font-bold ml-1 text-xs"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add variant sub-form card */}
+              <div className="bg-white border border-[#EBE7DF] rounded-2xl p-4 space-y-4">
+                <h4 className="text-[#1C1A17] text-xs font-bold uppercase tracking-wider">
+                  + Add Product Variant Option
+                </h4>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[#1C1A17] text-[9px] font-bold uppercase tracking-wider mb-1.5">Size</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 32, 34, L, XL"
+                      value={variantForm.size}
+                      onChange={(e) => setVariantForm(prev => ({ ...prev, size: e.target.value }))}
+                      className="w-full bg-[#FAF8F5] border border-[#E6E1D8] rounded-xl px-3 py-2 text-[#1C1A17] placeholder-neutral-400 focus:outline-none focus:border-[#8C7A65] text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[#1C1A17] text-[9px] font-bold uppercase tracking-wider mb-1.5">Color</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Black, White, Blue"
+                      value={variantForm.color}
+                      onChange={(e) => setVariantForm(prev => ({ ...prev, color: e.target.value }))}
+                      className="w-full bg-[#FAF8F5] border border-[#E6E1D8] rounded-xl px-3 py-2 text-[#1C1A17] placeholder-neutral-400 focus:outline-none focus:border-[#8C7A65] text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-[#1C1A17] text-[9px] font-bold uppercase tracking-wider mb-1.5">Stock</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={variantForm.stock}
+                      onChange={(e) => setVariantForm(prev => ({ ...prev, stock: Math.max(0, parseInt(e.target.value) || 0) }))}
+                      className="w-full bg-[#FAF8F5] border border-[#E6E1D8] rounded-xl px-3 py-2 text-[#1C1A17] focus:outline-none focus:border-[#8C7A65] text-xs"
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-[#1C1A17] text-[9px] font-bold uppercase tracking-wider mb-1.5">Price override (Optional)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      placeholder="e.g. 1299"
+                      value={variantForm.priceAmount}
+                      onChange={(e) => setVariantForm(prev => ({ ...prev, priceAmount: e.target.value }))}
+                      className="w-full bg-[#FAF8F5] border border-[#E6E1D8] rounded-xl px-3 py-2 text-[#1C1A17] focus:outline-none focus:border-[#8C7A65] text-xs"
+                    />
+                  </div>
+                </div>
+
+                {/* Variant images select */}
+                <div>
+                  <label className="block text-[#1C1A17] text-[9px] font-bold uppercase tracking-wider mb-1.5">
+                    Variant Images ({variantImages.length} / 7)
+                  </label>
+                  <div className="flex flex-wrap gap-2 items-center">
+                    {variantImages.map((img, idx) => (
+                      <div key={idx} className="relative w-12 h-12 rounded-lg overflow-hidden border border-[#EBE7DF]">
+                        <img src={img.preview} alt="" className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveVariantImage(idx)}
+                          className="absolute inset-0 bg-black/40 hover:bg-black/60 flex items-center justify-center text-white text-[10px] font-bold transition-all"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                    {variantImages.length < 7 && (
+                      <button
+                        type="button"
+                        onClick={() => variantFileInputRef.current?.click()}
+                        className="w-12 h-12 rounded-lg border-2 border-dashed border-[#E6E1D8] bg-[#FAF8F5] hover:border-[#C5BEB2] hover:bg-[#F5F2ED] flex items-center justify-center text-lg text-[#B5ADA2]"
+                      >
+                        +
+                      </button>
+                    )}
+                    <input
+                      ref={variantFileInputRef}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={handleVariantImageChange}
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleAddVariantToList}
+                  className="bg-[#FAF9F5] border border-[#8C7A65] text-[#8C7A65] hover:bg-[#F5F1E9] text-[10px] font-bold uppercase tracking-wider px-4 py-2 rounded-xl transition-all"
+                >
+                  + Add Variant to List
+                </button>
+              </div>
             </div>
 
             {/* Divider */}

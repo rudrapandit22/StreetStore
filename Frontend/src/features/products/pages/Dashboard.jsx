@@ -41,10 +41,16 @@ const EmptyState = () => (
 );
 
 // ── Product card ─────────────────────────────────────────────────────────────
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, onUnlistTrigger }) => {
   const [imgIdx, setImgIdx] = useState(0);
   const symbol = CURRENCY_SYMBOLS[product.price?.currency] ?? product.price?.currency;
   const hasMultiple = product.images?.length > 1;
+
+  const handleUnlist = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onUnlistTrigger(product._id);
+  };
 
   return (
     <Link to={`/seller/product/${product._id}`} className="group bg-white border border-[#EBE7DF] rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-[0_8px_32px_rgb(180,170,155,0.18)] hover:-translate-y-0.5 block">
@@ -92,29 +98,95 @@ const ProductCard = ({ product }) => {
       </div>
 
       {/* Content */}
-      <div className="p-4 space-y-2.5">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="text-[#1C1A17] font-semibold text-sm leading-snug line-clamp-1 flex-1">
-            {product.title}
-          </h3>
-          <span className="text-[#1C1A17] font-bold text-sm whitespace-nowrap">
-            {symbol}{product.price?.amount?.toLocaleString()}
-          </span>
+      <div className="p-4 space-y-2.5 flex-1 flex flex-col justify-between">
+        <div>
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="text-[#1C1A17] font-semibold text-sm leading-snug line-clamp-1 flex-1">
+              {product.title}
+            </h3>
+            <span className="text-[#1C1A17] font-bold text-sm whitespace-nowrap">
+              {symbol}{product.price?.amount?.toLocaleString()}
+            </span>
+          </div>
+
+          <p className="text-[#9C9188] text-xs leading-relaxed line-clamp-2 mt-1">
+            {product.description}
+          </p>
+
+          {/* Variant summary tags */}
+          {(() => {
+            if (!product.variants?.length) return null;
+            const sizes = new Set();
+            const colors = new Set();
+            product.variants.forEach(v => {
+              if (!v.attributes) return;
+              const raw = v.attributes;
+              let parsed = {};
+              if (typeof raw.toJSON === 'function') parsed = raw.toJSON();
+              else if (raw instanceof Map) parsed = Object.fromEntries(raw.entries());
+              else parsed = raw;
+              
+              Object.entries(parsed).forEach(([k, val]) => {
+                const kLower = k.toLowerCase();
+                if (kLower.includes('size')) sizes.add(val);
+                if (kLower.includes('color') || kLower.includes('colour')) colors.add(val);
+              });
+            });
+
+            const sizesArr = Array.from(sizes);
+            const colorsArr = Array.from(colors);
+
+            if (sizesArr.length === 0 && colorsArr.length === 0) return null;
+
+            return (
+              <div className="mt-2.5 pt-2 border-t border-[#F5F2ED] space-y-1.5">
+                {sizesArr.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-1">
+                    <span className="text-[9px] font-bold uppercase tracking-wider text-[#8C7A65]">Sizes:</span>
+                    <div className="flex flex-wrap gap-1">
+                      {sizesArr.map(s => (
+                        <span key={s} className="text-[9px] px-1.5 py-0.5 bg-[#FAF9F5] border border-[#EBE7DF] rounded-md text-[#6B5A47] font-semibold">
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {colorsArr.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-1">
+                    <span className="text-[9px] font-bold uppercase tracking-wider text-[#8C7A65]">Colors:</span>
+                    <div className="flex flex-wrap gap-1">
+                      {colorsArr.map(c => (
+                        <span key={c} className="text-[9px] px-1.5 py-0.5 bg-[#FAF9F5] border border-[#EBE7DF] rounded-md text-[#6B5A47] font-semibold">
+                          {c}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
         </div>
 
-        <p className="text-[#9C9188] text-xs leading-relaxed line-clamp-2">
-          {product.description}
-        </p>
-
-        <div className="flex items-center justify-between pt-1">
-          <span className="text-[#B5ADA2] text-[10px] font-semibold uppercase tracking-widest">
-            {product.price?.currency}
-          </span>
-          <span className="text-[#B5ADA2] text-[10px]">
-            {new Date(product.createdAt).toLocaleDateString('en-IN', {
-              day: 'numeric', month: 'short', year: 'numeric'
-            })}
-          </span>
+        <div className="flex items-center justify-between pt-3 mt-3 border-t border-[#F5F2ED]">
+          <div className="flex items-center gap-2">
+            <span className="text-[#B5ADA2] text-[10px] font-semibold uppercase tracking-widest">
+              {product.price?.currency}
+            </span>
+            <span className="text-[#B5ADA2] text-[10px]">•</span>
+            <span className="text-[#B5ADA2] text-[10px]">
+              {new Date(product.createdAt).toLocaleDateString('en-IN', {
+                day: 'numeric', month: 'short', year: 'numeric'
+              })}
+            </span>
+          </div>
+          <button
+            onClick={handleUnlist}
+            className="text-[10px] font-bold text-red-500 hover:text-red-700 uppercase tracking-wider bg-red-50 hover:bg-red-100 border border-red-100 rounded-md px-2 py-1 transition-all select-none"
+          >
+            Unlist
+          </button>
         </div>
       </div>
     </Link>
@@ -123,10 +195,26 @@ const ProductCard = ({ product }) => {
 
 // ── Dashboard ────────────────────────────────────────────────────────────────
 const Dashboard = () => {
-  const { handlegetsellerproduct } = useproduct();
+  const { handlegetsellerproduct, handledeleteproduct } = useproduct();
   const products = useSelector((state) => state.product.sellerproducts);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [toast, setToast] = useState(null);
+  const [confirmUnlist, setConfirmUnlist] = useState(null); // productId
+
+  const showToast = (message, type = "info") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const handleExecuteUnlist = async (productId) => {
+    try {
+      await handledeleteproduct(productId);
+      showToast("Product unlisted successfully", "success");
+    } catch (err) {
+      showToast(err.response?.data?.message || err.message || "Failed to unlist product", "error");
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -259,10 +347,64 @@ const Dashboard = () => {
             : products.length === 0
               ? <EmptyState />
               : products.map((product) => (
-                <ProductCard key={product._id} product={product} />
+                <ProductCard key={product._id} product={product} onUnlistTrigger={setConfirmUnlist} />
               ))}
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      {confirmUnlist && (
+        <div className="fixed inset-0 z-50 bg-[#1A1817]/40 backdrop-blur-[2px] flex items-center justify-center p-4">
+          <div className="bg-white border border-[#EBE7DF] rounded-2xl p-6 max-w-sm w-full shadow-xl space-y-4 animate-scale-in">
+            <h3 className="text-[#1A1817] font-bold font-serif uppercase tracking-widest text-xs border-b border-[#EBE7DF] pb-2">
+              Unlist Product
+            </h3>
+            <p className="text-xs text-[#6B5A47] leading-relaxed">
+              Are you sure you want to unlist this product? This action will remove it from the storefront catalog.
+            </p>
+            <div className="flex gap-2.5 justify-end pt-2">
+              <button
+                onClick={() => setConfirmUnlist(null)}
+                className="bg-[#FAF9F5] border border-[#EBE7DF] text-[#6B5A47] hover:bg-[#F5F1E9] text-[10px] font-bold uppercase tracking-wider px-3.5 py-2 rounded-xl transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  handleExecuteUnlist(confirmUnlist);
+                  setConfirmUnlist(null);
+                }}
+                className="bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold uppercase tracking-wider px-3.5 py-2 rounded-xl transition-all shadow-md active:scale-95"
+              >
+                Unlist Product
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed bottom-5 right-5 z-50 flex items-center gap-3 px-4 py-3 rounded-xl border backdrop-blur-md shadow-lg transition-all duration-300 animate-slide-in
+          ${toast.type === 'error'
+            ? 'bg-red-500/10 border-red-500/20 text-red-600'
+            : toast.type === 'success'
+              ? 'bg-[#1C1917] border-[#1C1917] text-white'
+              : 'bg-[#1C1917]/10 border-[#1C1917]/20 text-[#1C1917]'
+          }`}
+        >
+          {toast.type === 'error' ? (
+            <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          ) : (
+            <svg className="w-4 h-4 text-[#C5BEB2]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          )}
+          <span className="text-[10px] uppercase font-bold tracking-widest">{toast.message}</span>
+        </div>
+      )}
     </div>
   );
 };
