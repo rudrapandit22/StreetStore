@@ -20,7 +20,7 @@ export function imagekitAuth(req, res) {
 // createproduct now receives imageUrls as a JSON array (uploaded directly to ImageKit from the browser)
 export async function createproduct(req, res) {
     try {
-        const { title, description, priceAmount, priceCurrency, imageUrls } = req.body;
+        const { title, description, priceAmount, priceCurrency, imageUrls, variants } = req.body;
         const seller = req.user;
 
         // Validate priceAmount
@@ -43,6 +43,15 @@ export async function createproduct(req, res) {
 
         const images = urls.map((url) => ({ url }));
 
+        let parsedVariants = [];
+        if (variants) {
+            try {
+                parsedVariants = typeof variants === "string" ? JSON.parse(variants) : variants;
+            } catch {
+                parsedVariants = [];
+            }
+        }
+
         const product = await productmodel.create({
             title,
             description,
@@ -51,6 +60,7 @@ export async function createproduct(req, res) {
                 currency: priceCurrency || "INR"
             },
             images,
+            variants: parsedVariants,
             seller: seller._id
         });
 
@@ -203,5 +213,32 @@ export async function updateVariantStock(req, res) {
         });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+export async function deleteproduct(req, res) {
+    try {
+        const { productId } = req.params;
+        const seller = req.user;
+
+        const product = await productmodel.findOne({ _id: productId, seller: seller._id });
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found or unauthorized"
+            });
+        }
+
+        await productmodel.deleteOne({ _id: productId });
+
+        res.status(200).json({
+            message: "Product unlisted successfully",
+            success: true
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
     }
 }

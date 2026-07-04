@@ -38,6 +38,11 @@ export const addtocart = async(req,res)=>{
             item.variant.toString() === variantId
         );
 
+        const matchedVariant = product.variants.id(variantId);
+        const cartItemPrice = (matchedVariant && matchedVariant.price && matchedVariant.price.amount !== undefined && matchedVariant.price.amount !== null)
+            ? matchedVariant.price
+            : product.price;
+
         if (itemIndex > -1) {
             const currentQuantity = cart.items[itemIndex].quantity;
             if (currentQuantity + quantity > stock) {
@@ -47,6 +52,7 @@ export const addtocart = async(req,res)=>{
                 });
             }
             cart.items[itemIndex].quantity += quantity;
+            cart.items[itemIndex].price = cartItemPrice;
         } else {
             if (quantity > stock) {
                 return res.status(400).json({
@@ -58,7 +64,7 @@ export const addtocart = async(req,res)=>{
                 product: productId,
                 variant: variantId,
                 quantity,
-                price: product.price
+                price: cartItemPrice
             });
         }
 
@@ -82,7 +88,7 @@ export const addtocart = async(req,res)=>{
 export const getcart = async (req,res)=>{
     try {
         const user = req.user;
-        let cart = await cartmodel.findOne({user: user._id}).populate("items.product");
+        let cart = await cartmodel.findOne({ user: user._id }).populate("items.product");
 
         if(!cart){
             cart = await cartmodel.create({ user: user._id, items: [] });
@@ -197,3 +203,107 @@ export const updatequantity = async (req, res) => {
         });
     }
 };
+
+export const incrementquantity = async (req, res) => {
+    try {
+        const { productId, variantId } = req.params;
+
+        const stock = await stockofvarient(productId, variantId);
+        const cart = await cartmodel.findOne({ user: req.user._id });
+        if (!cart) {
+            return res.status(404).json({
+                message: "Cart not found",
+                success: false
+            });
+        }
+
+        const itemIndex = cart.items.findIndex(item => 
+            item.product.toString() === productId && 
+            item.variant.toString() === variantId
+        );
+
+        if (itemIndex === -1) {
+            return res.status(404).json({
+                message: "Item not found in cart",
+                success: false
+            });
+        }
+
+        if (cart.items[itemIndex].quantity + 1 > stock) {
+            return res.status(400).json({
+                message: `Only ${stock} items available in stock`,
+                success: false
+            });
+        }
+
+        cart.items[itemIndex].quantity += 1;
+        await cart.save();
+
+        const updatedCart = await cartmodel.findOne({ user: req.user._id }).populate("items.product");
+
+        return res.status(200).json({
+            message: "Quantity incremented successfully",
+            success: true,
+            cart: updatedCart
+        });
+    } catch (error) {
+        console.error("incrementquantity error:", error);
+        return res.status(500).json({
+            message: "Internal server error",
+            success: false,
+            error: error.message
+        });
+    }
+};
+
+export const decrementquantity = async (req, res) => {
+    try {
+        const { productId, variantId } = req.params;
+
+        const cart = await cartmodel.findOne({ user: req.user._id });
+        if (!cart) {
+            return res.status(404).json({
+                message: "Cart not found",
+                success: false
+            });
+        }
+
+        const itemIndex = cart.items.findIndex(item => 
+            item.product.toString() === productId && 
+            item.variant.toString() === variantId
+        );
+
+        if (itemIndex === -1) {
+            return res.status(404).json({
+                message: "Item not found in cart",
+                success: false
+            });
+        }
+
+        if (cart.items[itemIndex].quantity - 1 < 1) {
+            return res.status(400).json({
+                message: "Quantity must be at least 1",
+                success: false
+            });
+        }
+
+        cart.items[itemIndex].quantity -= 1;
+        await cart.save();
+
+        const updatedCart = await cartmodel.findOne({ user: req.user._id }).populate("items.product");
+
+        return res.status(200).json({
+            message: "Quantity decremented successfully",
+            success: true,
+            cart: updatedCart
+        });
+    } catch (error) {
+        console.error("decrementquantity error:", error);
+        return res.status(500).json({
+            message: "Internal server error",
+            success: false,
+            error: error.message
+        });
+    }
+};
+

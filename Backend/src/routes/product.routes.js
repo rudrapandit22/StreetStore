@@ -1,6 +1,6 @@
 import express from "express";
 import { authenticateSeller } from "../middlewares/auth.middle.js";
-import { createproduct, getallproducts, getsellerproduct, imagekitAuth, getproductbyid, addVariant, updateVariantStock } from "../controllers/product.controller.js";
+import { createproduct, getallproducts, getsellerproduct, imagekitAuth, getproductbyid, addVariant, updateVariantStock, deleteproduct } from "../controllers/product.controller.js";
 import { upload } from "../middlewares/upload.middle.js";
 
 const router = express.Router();
@@ -16,6 +16,8 @@ router.get("/seller", authenticateSeller, getsellerproduct);
 router.get("/", getallproducts)
 
 router.get("/:productId", getproductbyid)
+
+router.delete("/:productId", authenticateSeller, deleteproduct)
 
 router.post("/:productId/variants", authenticateSeller, upload.array("image", 7), addVariant);
 router.put("/:productId/variants/stock", authenticateSeller, updateVariantStock);
