@@ -21,7 +21,9 @@ const allowedOrigins = [
 
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
+        const normalized = origin ? origin.replace(/\/$/, "") : "";
+        const allowedNormalized = allowedOrigins.map(o => o.replace(/\/$/, ""));
+        if (!origin || allowedNormalized.includes(normalized)) {
             callback(null, true);
         } else {
             callback(new Error(`CORS blocked: ${origin}`));
