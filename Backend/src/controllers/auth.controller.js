@@ -84,7 +84,6 @@ export const googlecallback = async (req, res) => {
     const {id,displayName,emails}= req.user
 
     const email = emails[0].value;
-    const profilePic = photos[0].value;
 
 
     const user = await usermodel.findOne({
@@ -100,10 +99,9 @@ export const googlecallback = async (req, res) => {
 
     const token = jwt.sign({
         id:user._id,
-    },config.JWT_SECRET,{
+    },process.env.JWT_SECRET,{
         expiresIn:"7d"
-    }
-)
+    })
 
     res.cookie("token",token)
 
