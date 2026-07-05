@@ -21,6 +21,7 @@ const allowedOrigins = [
     "http://localhost:5175",
     "http://localhost:5176",
     "https://streetstore.onrender.com",
+    "https://street-store-frontend-mwr6.vercel.app",
 ];
 
 app.use(cors({
