@@ -16,7 +16,7 @@ app.use(cookieParser());
 
 const allowedOrigins = [
     "https://streetstore.onrender.com",
-    "https://street-store-frontend-mwr6.vercel.app",
+    "https://streetstorefrontend.vercel.app",
 ];
 
 app.use(cors({

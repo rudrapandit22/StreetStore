@@ -15,7 +15,7 @@ router.get("/google",
     passport.authenticate("google",{scope:["profile","email"]}))
 
 router.get("/google/callback",
-    passport.authenticate("google", { session: false, failureRedirect: "https://street-store-frontend-mwr6.vercel.app/login" }),
+    passport.authenticate("google", { session: false, failureRedirect: "https://streetstorefrontend.vercel.app/login" }),
     googlecallback
 )
 
