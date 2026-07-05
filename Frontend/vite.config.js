@@ -9,7 +9,7 @@ export default defineConfig({
     strictPort: false, // try next port if 5173 is busy
     proxy: {
       "/api": {
-        target: "http://localhost:3000",
+        target: "https://streetstore.onrender.com",
         changeOrigin: true,
         secure: false,
       }

@@ -107,7 +107,7 @@ export const googlecallback = async (req, res) => {
 
     res.cookie("token",token)
 
-    res.redirect("http://localhost:5173")
+    res.redirect("https://streetstore.onrender.com")
 }
 
 export const getMe = async (req,res) => {

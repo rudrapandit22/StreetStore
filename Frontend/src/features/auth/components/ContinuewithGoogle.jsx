@@ -5,7 +5,7 @@ const ContinuewithGoogle = () => {
 
   return (
     <a
-      href="http://localhost:3000/api/auth/google"
+      href="https://streetstore.onrender.com/api/auth/google"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
