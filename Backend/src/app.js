@@ -14,12 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Allow any localhost port Vite might pick (5173, 5174, 5175...)
 const allowedOrigins = [
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "http://localhost:5175",
-    "http://localhost:5176",
     "https://streetstore.onrender.com",
     "https://street-store-frontend-mwr6.vercel.app",
 ];
