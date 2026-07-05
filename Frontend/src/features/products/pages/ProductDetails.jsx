@@ -289,18 +289,32 @@ const ProductDetails = () => {
               );
 
               const getValuesForAttribute = (key) => {
-                return Array.from(
-                  new Set(
-                    product.variants.map(v => getParsedAttributes(v)[key]).filter(Boolean)
-                  )
-                );
+                const rawValues = product.variants.map(v => getParsedAttributes(v)[key]).filter(Boolean);
+                if (key.toLowerCase().includes('size')) {
+                  const splitValues = [];
+                  rawValues.forEach(val => {
+                    if (typeof val === 'string' && val.includes(',')) {
+                      val.split(',').forEach(s => splitValues.push(s.trim()));
+                    } else {
+                      splitValues.push(String(val).trim());
+                    }
+                  });
+                  return Array.from(new Set(splitValues));
+                }
+                return Array.from(new Set(rawValues));
               };
 
               const isOptionSelectable = (key, val) => {
                 const testAttrs = { ...selectedAttributes, [key]: val };
                 return product.variants.some(v => {
                   const vAttrs = getParsedAttributes(v);
-                  return Object.entries(testAttrs).every(([k, vVal]) => vAttrs[k] === vVal);
+                  return Object.entries(testAttrs).every(([k, vVal]) => {
+                    const attrVal = vAttrs[k];
+                    if (k.toLowerCase().includes('size') && typeof attrVal === 'string' && attrVal.includes(',')) {
+                      return attrVal.split(',').map(s => s.trim()).includes(vVal);
+                    }
+                    return attrVal === vVal;
+                  });
                 });
               };
 
@@ -310,16 +324,32 @@ const ProductDetails = () => {
 
                 let match = product.variants.find(v => {
                   const vAttrs = getParsedAttributes(v);
-                  return Object.entries(nextAttrs).every(([k, val]) => vAttrs[k] === val);
+                  return Object.entries(nextAttrs).every(([k, val]) => {
+                    const attrVal = vAttrs[k];
+                    if (k.toLowerCase().includes('size') && typeof attrVal === 'string' && attrVal.includes(',')) {
+                      return attrVal.split(',').map(s => s.trim()).includes(val);
+                    }
+                    return attrVal === val;
+                  });
                 });
 
                 if (!match) {
-                  match = product.variants.find(v => getParsedAttributes(v)[key] === value);
+                  match = product.variants.find(v => {
+                    const attrVal = getParsedAttributes(v)[key];
+                    if (key.toLowerCase().includes('size') && typeof attrVal === 'string' && attrVal.includes(',')) {
+                      return attrVal.split(',').map(s => s.trim()).includes(value);
+                    }
+                    return attrVal === value;
+                  });
                   if (match) {
                     const parsed = getParsedAttributes(match);
                     const newAttrs = {};
                     Object.entries(parsed).forEach(([k, v]) => {
-                      newAttrs[k] = v;
+                      if (k.toLowerCase().includes('size') && typeof v === 'string' && v.includes(',')) {
+                        newAttrs[k] = value;
+                      } else {
+                        newAttrs[k] = v;
+                      }
                     });
                     setSelectedAttributes(newAttrs);
                   }
@@ -339,7 +369,13 @@ const ProductDetails = () => {
                 const testAttrs = { ...selectedAttributes, [key]: val };
                 let match = product.variants.find(v => {
                   const vAttrs = getParsedAttributes(v);
-                  return Object.entries(testAttrs).every(([k, vVal]) => vAttrs[k] === vVal);
+                  return Object.entries(testAttrs).every(([k, vVal]) => {
+                    const attrVal = vAttrs[k];
+                    if (k.toLowerCase().includes('size') && typeof attrVal === 'string' && attrVal.includes(',')) {
+                      return attrVal.split(',').map(s => s.trim()).includes(vVal);
+                    }
+                    return attrVal === vVal;
+                  });
                 });
 
                 if (!match || !match.images?.length) {
@@ -466,10 +502,8 @@ const ProductDetails = () => {
                   disabled={addingToCart || buyingNow || !selectedVariant || selectedVariant.stock === 0}
                   className="flex-1 bg-white border border-[#EBE7DF] text-neutral-800 hover:bg-[#FAF9F5] text-xs font-bold uppercase tracking-widest py-4 px-6 rounded-xl transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  <svg className="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                  </svg>
-                  <span>Wishlist</span>
+                  
+                  <span>Go to Cart</span>
                 </button>
               </div>
               <p className="text-[9px] text-center text-[#B5ADA2] uppercase tracking-wider font-semibold mt-4">
