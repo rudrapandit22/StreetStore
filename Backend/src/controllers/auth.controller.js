@@ -10,7 +10,8 @@ async function sendtokenresponse(user, res, message) {
 
     res.cookie("token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: true,
+        sameSite: "None",
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
@@ -103,7 +104,12 @@ export const googlecallback = async (req, res) => {
         expiresIn:"7d"
     })
 
-    res.cookie("token",token)
+    res.cookie("token", token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None",
+        maxAge: 7 * 24 * 60 * 60 * 1000
+    });
 
     res.redirect("https://streetstorefrontend.vercel.app")
 }
