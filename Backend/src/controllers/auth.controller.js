@@ -1,18 +1,23 @@
 import usermodel from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 
-async function sendtokenresponse(user, res, message) {
+const isLocalhost = (req) => {
+    const host = req.get('host') || '';
+    return host.includes('localhost') || host.includes('127.0.0.1');
+};
+
+async function sendtokenresponse(user, req, res, message) {
     const token = jwt.sign(
         { id: user._id },
         process.env.JWT_SECRET,
         { expiresIn: "7d" }
     );
 
-    const isProd = process.env.NODE_ENV === "production";
+    const isLocal = isLocalhost(req);
     res.cookie("token", token, {
         httpOnly: true,
-        secure: isProd,
-        sameSite: isProd ? "None" : "Lax",
+        secure: !isLocal,
+        sameSite: isLocal ? "Lax" : "None",
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
@@ -48,7 +53,7 @@ export const register = async (req, res) => {
 
         })
 
-        await sendtokenresponse(user, res, "user registered sucessfully")
+        await sendtokenresponse(user, req, res, "user registered sucessfully")
 
 
 
@@ -77,7 +82,7 @@ export const login = async (req, res) => {
 
     }
 
-    await sendtokenresponse(user, res, "user logged in successfully")
+    await sendtokenresponse(user, req, res, "user logged in successfully")
 
 
 }
@@ -105,11 +110,11 @@ export const googlecallback = async (req, res) => {
         expiresIn:"7d"
     })
 
-    const isProd = process.env.NODE_ENV === "production";
+    const isLocal = isLocalhost(req);
     res.cookie("token", token, {
         httpOnly: true,
-        secure: isProd,
-        sameSite: isProd ? "None" : "Lax",
+        secure: !isLocal,
+        sameSite: isLocal ? "Lax" : "None",
         maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
@@ -135,11 +140,11 @@ export const getMe = async (req,res) => {
 }
 
 export const logout = async (req, res) => {
-    const isProd = process.env.NODE_ENV === "production";
+    const isLocal = isLocalhost(req);
     res.clearCookie("token", {
         httpOnly: true,
-        secure: isProd,
-        sameSite: isProd ? "None" : "Lax"
+        secure: !isLocal,
+        sameSite: isLocal ? "Lax" : "None"
     });
     res.status(200).json({ message: "Logged out successfully", success: true });
 }
