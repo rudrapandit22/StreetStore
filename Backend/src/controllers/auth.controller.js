@@ -87,7 +87,7 @@ export const googlecallback = async (req, res) => {
     const email = emails[0].value;
 
 
-    const user = await usermodel.findOne({
+    let user = await usermodel.findOne({
         email
     })
     if(!user){
