@@ -60,3 +60,7 @@ export async function updateVariantStockApi(productId, variantId, stock) {
     const response = await productapiinstance.put(`/${productId}/variants/stock`, { variantId, stock })
     return response.data
 }
+export async function getallproducts(){
+    const response = await productapiinstance.get("/")
+    return response.data
+}

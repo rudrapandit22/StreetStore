@@ -26,7 +26,3 @@ export async function getMe(){
     return response.data 
 }
 
-export async function getallproducts(){
-    const response = await productapiinstance.get("/")
-    return response.data
-}
