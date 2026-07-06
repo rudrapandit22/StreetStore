@@ -8,10 +8,11 @@ async function sendtokenresponse(user, res, message) {
         { expiresIn: "7d" }
     );
 
+    const isProd = process.env.NODE_ENV === "production";
     res.cookie("token", token, {
         httpOnly: true,
-        secure: true,
-        sameSite: "None",
+        secure: isProd,
+        sameSite: isProd ? "None" : "Lax",
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
@@ -104,10 +105,11 @@ export const googlecallback = async (req, res) => {
         expiresIn:"7d"
     })
 
+    const isProd = process.env.NODE_ENV === "production";
     res.cookie("token", token, {
         httpOnly: true,
-        secure: true,
-        sameSite: "None",
+        secure: isProd,
+        sameSite: isProd ? "None" : "Lax",
         maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
@@ -130,4 +132,14 @@ export const getMe = async (req,res) => {
         }
     })
     
+}
+
+export const logout = async (req, res) => {
+    const isProd = process.env.NODE_ENV === "production";
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: isProd ? "None" : "Lax"
+    });
+    res.status(200).json({ message: "Logged out successfully", success: true });
 }
