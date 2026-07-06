@@ -2,12 +2,24 @@ import React, { useEffect, useState } from 'react';
 import { useproduct } from '../hooks/useproducts';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router';
+import { useauth } from '../../auth/hook/useAuth.js';
 
 const Home = () => {
   const { handlegetallproducts } = useproduct();
   const products = useSelector((state) => state.product.products);
-  const user = useSelector((state) => state.auth.user);
+  const { user, handlelogout } = useauth();
   const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message, type = "info") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const onLogout = async () => {
+    await handlelogout();
+    showToast("Logged out successfully", "success");
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -53,6 +65,14 @@ const Home = () => {
             </svg>
             <span className="absolute top-0 right-0 w-2 h-2 bg-[#8C7A65] rounded-full"></span>
           </Link>
+          {user && (
+            <button
+              onClick={onLogout}
+              className="text-xs uppercase tracking-wider font-bold text-[#6B5A47] hover:text-[#1C1917] transition-colors cursor-pointer"
+            >
+              Logout
+            </button>
+          )}
         </div>
       </nav>
 
@@ -173,6 +193,20 @@ const Home = () => {
           </div>
         )}
       </div>
+
+      {toast && (
+        <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-xl border backdrop-blur-md animate-slide-up
+          ${toast.type === 'error'
+            ? 'bg-rose-50/95 border-rose-200/60 text-rose-800'
+            : 'bg-emerald-50/95 border-emerald-200/60 text-emerald-800'
+          }`}
+        >
+          <svg className="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span className="text-[10px] uppercase font-bold tracking-widest">{toast.message}</span>
+        </div>
+      )}
     </div>
   );
 };
